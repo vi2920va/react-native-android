@@ -1,62 +1,74 @@
 import React from 'react';
-import {
-  createNativeStackNavigator,
-  NativeStackScreenProps,
-} from '@react-navigation/native-stack';
-import {Text, View, Button, StyleSheet} from 'react-native';
-import {NavigationContainer} from '@react-navigation/native';
+import { View, Text, Button, StyleSheet } from 'react-native';
+import { createNativeStackNavigator, NativeStackScreenProps } from '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
 
 type RootStackParamList = {
   Home: undefined;
-  Details: {itemId: number; otherParam?: string};
-};
+  Details: {
+    itemId: number;
+    otherParam?: string;
+  }
+}
+type HomeScrrenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
+type DetailsScreenProps = NativeStackScreenProps<RootStackParamList, 'Details'>;
 
-type HomeScreenProps = NativeStackScreenProps<RootStackParamList, 'Home'>;
-
-function HomeScreen({navigation}: HomeScreenProps) {
+function HomeScreen({ navigation }: HomeScrrenProps) {
   return (
-    <View style={styles.Home}>
-      <Text>Home Screen</Text>
-      <Button
-        title="Go to Details"
+    <View style={styles.Container}>
+      <Text>Home Scrren</Text>
+      <Button title="Go to Details"
         onPress={() => {
-          /* 1. 매개변수를 사용하여 Detalis 경로 이동 */
+          /* 1. Navigate to the Details route with params */
           navigation.navigate('Details', {
             itemId: 86,
             otherParam: 'anything you want here',
-          });
-        }}
-      />
+          })
+        }} />
     </View>
-  );
+  )
 }
 
-// 앱 각 화면이 전환될 수 있는 기본 틀 제공
+function DetailsScreen({ navigation, route }: DetailsScreenProps) {
+  /* 2. Get the param */
+  const { itemId, otherParam } = route.params;
+  return (
+    <View style={styles.Container}>
+      <Text>Details Screen</Text>
+      <Text>itemID : {JSON.stringify(itemId)}</Text>
+      <Text>otherParam: {JSON.stringify(otherParam)}</Text>
+      <Button
+        title="Go to Details... again"
+        onPress={() => navigation.push('Details', {
+            itemId: Math.floor(Math.random() * 100)
+          })
+        }
+      />
+      <Button title="Go to Home" onPress={() => navigation.navigate('Home')} />
+      <Button title="Go back" onPress={() => navigation.goBack()} />
+    </View>
+  )
+}
+
 const Stack = createNativeStackNavigator();
 
 function App() {
   return (
-    // 네비게이션 트리를 관리해주는 컴포넌트
     <NavigationContainer>
-      {/* 네비게이션 기본틀 스택 생성 */}
       <Stack.Navigator>
-        {/* 해당 스택에 들어갈 화면 요소 */}
-        <Stack.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{title: '제목'}}
-        />
+        <Stack.Screen name="Home" component={HomeScreen} options={{ title: '제목' }} />
+        <Stack.Screen name="Details" component={DetailsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
-  );
-}
+  )
+};
 
 const styles = StyleSheet.create({
-  Home: {
+  Container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-  },
-});
+    justifyContent: 'center'
+  }
+})
 
 export default App;
